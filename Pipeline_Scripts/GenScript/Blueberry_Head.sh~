@@ -1,0 +1,12 @@
+./Dada2Pipe.sh ../../Config/dada2/Blueberry.txt high &
+./UsearchPipe.sh ../../Config/unoise/Blueberry.txt high &
+./DeblurPipeP.sh ../../Config/deblur/Blueberry.txt high &
+wait
+./Dada2Pipe.sh ../../Config/dada2/Blueberry.txt med &
+./UsearchPipe.sh ../../Config/unoise/Blueberry.txt med &
+./DeblurPipeP.sh ../../Config/deblur/Blueberry.txt med &
+wait
+./Dada2Pipe.sh ../../Config/dada2/Blueberry.txt low &
+./UsearchPipe.sh ../../Config/unoise/Blueberry.txt low &
+./DeblurPipeP.sh ../../Config/deblur/Blueberry.txt low &
+wait
