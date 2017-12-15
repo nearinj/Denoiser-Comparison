@@ -1,3 +1,4 @@
+#Used to make the observed vs expected for the Mock12 study
 library(ggplot2)
 library(cowplot)
 setwd("~/projects/DenoiseCompare/Data_Analysis/Abundance/collapsed/")

@@ -1,6 +1,9 @@
+#used to assign taxa to the blueberry data generated from the deblur pipeline
 library(dada2)
 
 setwd("~/projects/DenoiseCompare_Out/Blueberry/med/deblurP/final/")
+
+#Example table not actually used other than to look at
 seqtab <- readRDS("~/projects/DenoiseCompare_Out/Blueberry/med/dada2/seqtab_final.rds")
 
 

@@ -1,3 +1,5 @@
+#Used to make the Bray_Curtis Box plots for the blueberry data
+
 library(ggplot2)
 setwd("~/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/bray_curtis/")
 par=(mfrow=c(2,2))

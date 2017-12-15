@@ -1,5 +1,4 @@
-#make 2d plots for blueberry
-
+#make 2d PCoA plots for blueberry
 
 
 setwd("~/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/")

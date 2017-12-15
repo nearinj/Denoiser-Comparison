@@ -1,4 +1,4 @@
-#script that gets mean of each sample and graphs all them in one graph..
+#script that gets mean abudance of taxa of each sample and graphs all them in one graph per Study..
 library(ggplot2)
 
 makeFullTable <- function(add_t,add_E){
