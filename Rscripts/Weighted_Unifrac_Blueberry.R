@@ -1,13 +1,10 @@
-#Used to make the Bray_Curtis Box plots for the blueberry data
-
-#taxa summaries are in 
-
+#Used to make the Weighted Unifrac Box plots for the blueberry data
 
 library(ggplot2)
-setwd("~/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/bray_curtis/")
+setwd("~/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/plots/bdiv-out/")
 par=(mfrow=c(2,2))
-DM <- read.table("tax_sum/beta_diversity/bray_curtis_merged_blueberry_taxa_L6.txt", sep="\t", header=TRUE, row.names=1)
-bluberry_map <- read.table("../map_blueberry_merged.csv", sep="\t", header=T, stringsAsFactors = FALSE,) 
+DM <- read.table("weighted_unifrac_dm.txt", sep="\t", header=TRUE, row.names=1)
+bluberry_map <- read.table("../../map_blueberry_merged.csv", sep="\t", header=T, stringsAsFactors = FALSE,) 
 
 reorder_pipeline_samples <- function(dm_input, row_prefix, col_prefix) {
   
@@ -17,7 +14,7 @@ reorder_pipeline_samples <- function(dm_input, row_prefix, col_prefix) {
   colnames(dm_input_ordered) <- gsub("^", col_prefix, colnames(dm_input_ordered))
   
   dm_input_colnames_sample <- gsub(col_prefix, "", colnames(dm_input_ordered))
-  
+  
   if(! identical(dm_input_colnames_sample, dm_input_rownames_sample)) {
     stop("Error final row and column names don't match")
   } else {
@@ -127,6 +124,6 @@ boxplot(diag(DavDe_ordered),
         unoiseVunoiseRhizo[upper.tri(unoiseVunoiseRhizo, diag=FALSE)],
         names=c("Dada_Deblur", "Unoise_Dada","Unoise_Deblur","Deblur_Bulk", "Dada_Bulk", "Unoise_Bulk", "Deblur_Rhizo", "Dada_Rhizo", "Unoise_Rhizo"),
         outline = FALSE,
-        ylab="Bray Curtis Distance"
+        ylab="Weighted UniFrac Distance"
   )
 

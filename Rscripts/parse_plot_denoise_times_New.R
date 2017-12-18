@@ -52,5 +52,5 @@ group.colors <- c(Deblur = "#333BFF", Dada = "#CC6600", Unoise = "#9633FF")
 recombined_time$Filt <- factor(recombined_time$Filt, levels = orders)
 
 timeplot <- ggplot(recombined_time, aes(x= Filt, y=log10(User), fill=Pipeline)) + geom_bar(stat = "identity") + scale_fill_manual(values=group.colors) +
-  xlab("") + theme(axis.text = element_text(size=10)) + ylab("log10(User Time in Minutes)")
+  xlab("") + theme(axis.text = element_text(size=10)) + ylab("User Time in Seconds") + scale_y_continuous(breaks=c(0,1,2,3,4,5), labels=c("0","10","100","1000","10000","100000"))
 timeplot

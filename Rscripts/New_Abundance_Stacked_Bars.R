@@ -1,5 +1,6 @@
-#script that gets mean abudance of taxa of each sample and graphs all them in one graph per Study..
+#script that gets mean of each sample and graphs all them in one graph..
 library(ggplot2)
+library(scales)
 
 makeFullTable <- function(add_t,add_E){
   table <- read.table(paste(add_t), header = TRUE, sep = "\t", stringsAsFactors = FALSE)
@@ -152,7 +153,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
                                  y = rel_abun, 
                                  fill = Organism)) + 
     geom_bar(position = "fill", stat = "identity") +
-    scale_fill_manual(values=c("#000000", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
+    scale_fill_manual(values=c("#bdbdbd", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
                                                       legend.title = element_text(size=10), axis.text.x = element_text(size=6)) +
                                                       labs(x="Pipelines", y="Relative Abundance")
   
@@ -167,7 +168,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
                                      y = rel_abun, 
                                      fill = Organism)) + 
     geom_bar(position = "fill", stat = "identity") +
-    scale_fill_manual(values=c("#000000", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
+    scale_fill_manual(values=c("#bdbdbd", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
                                                       legend.title = element_text(size=10), axis.text.x = element_text(size=6)) + 
                                                       labs(x="Pipelines", y="Relative Abundance")
   
@@ -181,7 +182,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
                                        y = rel_abun, 
                                        fill = Organism)) + 
     geom_bar(position = "fill", stat = "identity") +
-    scale_fill_manual(values=c("#000000", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
+    scale_fill_manual(values=c("#bdbdbd", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
                                                       legend.title = element_text(size=10), axis.text.x = element_text(size=6)) +
                                                       labs(x = "Pipelines", y="Relative Abundance")
   
@@ -195,7 +196,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
                                         y = rel_abun, 
                                         fill = Organism)) + 
     geom_bar(position = "fill", stat = "identity") +
-    scale_fill_manual(values=c("#000000", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
+    scale_fill_manual(values=c("#bdbdbd", qual_col_repeat)) + theme(legend.key.size = unit(.5, "line"), legend.text=element_text(size=6), 
                                                       legend.title = element_text(size=10), axis.text.x = element_text(size=6)) + 
                                                       labs(x = "Pipelines", y="Relative Abundance")
   
