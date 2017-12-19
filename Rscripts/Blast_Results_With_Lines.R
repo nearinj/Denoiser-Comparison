@@ -4,16 +4,23 @@ library(cowplot)
 
 #Used to create stacked barcharts for the blast results
 
-setwd("~/projects/DenoiseCompare/Data_Analysis/")
+setwd("/home/jacob/projects/DenoiseCompare/Data_Analysis/")
+
+# Read in results of blasting study seqs to expected sequences.
 Expected <- read.table("BlastResults.tsv", header = F, sep = "\t")
 colnames(Expected) <- c("Study", "Pipeline", "Filter", "100% Expected", "97% Expected")
+
+# Read in results of blasting study seqs to SILVA database.
 Silva <- read.table("Silva_Blast_Results.tsv", header =F, sep = "\t")
 colnames(Silva) <- c("Study", "Pipeline", "Filter", "100% Database", "97% Database")
-Final <- merge(Expected, Silva, all = T)
-Unmatched <- read.table("Missed.txt", header = F, sep = " ")
-Unmatched$nomatch <- (Unmatched[,2]-(Silva[,4] + Silva[,5]))
-Final$Unmatched <- Unmatched$nomatch
 
+Final <- merge(Expected, Silva, all = T)
+
+# Read in # seqs that didn't match expected seq.
+Unmatched <- read.table("Missed.txt", header = F, sep = " ")
+Final$Unmatched <- (Unmatched$V2-(Silva$`100% Database` + Silva$`97% Database`))
+
+# Subset final table to different filter settings.
 Low_Filt <- Final[Final$Filter == 'Low',]
 Low_Filt <- Low_Filt[, -3]
 Med_Filt <- Final[Final$Filter == 'Med',]
@@ -21,6 +28,7 @@ Med_Filt <- Med_Filt[,-3]
 High_Filt <- Final[Final$Filter == 'High',]
 High_Filt <- High_Filt[, -3]
 
+# Plot samples (need to load in below function first)
 PlotSamples(High_Filt, "High")
 PlotSamples(Med_Filt, "Med")
 PlotSamples(Low_Filt, "Low")
@@ -41,8 +49,6 @@ PlotSamples <- function(tab1, filt){
   orders <- c("Unmatched", "97% Database","100% Database","97% Expected","100% Expected")
   
   Unique_expected <- read.table("Unique_counts.txt", sep="\t", header=F)
- 
-  
   
   HMP_melt <- melt(data = HMP, id.vars = c("Pipeline"), measured.vars = c("100% Expected", "97% Expected", "100% Database", "97% Database", "Unmatched"),
                        value.name = "Counts", variable.name="WorkFlow")
@@ -79,4 +85,5 @@ PlotSamples <- function(tab1, filt){
   
   grid_plot <- plot_grid(HMP_plot, Mock12_plot, Mock9_plot, Zymock_plot, labels=c("A", "B", "C", "D"))
   save_plot(paste("Blast_Comp_Figs/ASV Comparison_", filt, ".png", sep=""), grid_plot, base_aspect_ratio = 2)
+
 }
