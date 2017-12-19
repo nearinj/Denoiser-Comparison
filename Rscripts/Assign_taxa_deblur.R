@@ -1,53 +1,51 @@
 #used to assign taxa to the blueberry data generated from the deblur pipeline
 library(dada2)
 
-setwd("~/projects/DenoiseCompare_Out/Blueberry/med/deblurP/final/")
+setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/deblurP/final/")
 
-#Example table not actually used other than to look at
-seqtab <- readRDS("~/projects/DenoiseCompare_Out/Blueberry/med/dada2/seqtab_final.rds")
+deblurtable <- read.table("table.tsv", 
+                          header=TRUE, 
+                          sep="\t", 
+                          stringsAsFactors = F, 
+                          skip=1, 
+                          comment.char="",
+                          row.names=1)
 
-
-deblurtable <- read.table("table.tsv", header=TRUE, sep="\t", stringsAsFactors = F)
 deblurID <- read.table("seqID.tsv", header=FALSE, sep="\t")
 
-target <- deblurtable$OTU.ID
+target <- rownames(deblurtable)
 
 deblurIDtemp <- deblurID[match(target, deblurID$V1),]
 dim(deblurID)
 
-deblurtable$OTU.ID <- deblurIDtemp$V2
+rownames(deblurtable) <- deblurIDtemp$V2
 deblurtablelong <- t(deblurtable)
 
-
-colnames(deblurtablelong) = deblurtablelong[1,]
-deblurtablelong <- deblurtablelong[-1,]
 dim(deblurtablelong)
-class(deblurtablelong) <- "numeric"
 
-taxa <- assignTaxonomy(deblurtablelong, "/scratch/db/dada2_ref_db/rdp_train_set_16.fa.gz", multithread = T)
+deblur_taxa <- assignTaxonomy(deblurtablelong, "/scratch/db/dada2_ref_db/rdp_train_set_16.fa.gz", multithread = 40)
 
-saveRDS(taxa, file="tax_final.rds")
+saveRDS(deblur_taxa, file="tax_final.rds")
 saveRDS(deblurtablelong, file="seqtab_final.rds")
 
-setwd("../../Unoise/")
-unoisetable <- read.table("otutab.txt", header=TRUE, sep="\t")
+### Assign taxonomy to UNOISE sequences.
+setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/Unoise/")
+unoisetable <- read.table("otutab.txt",                           
+                          header=TRUE, 
+                          sep="\t", 
+                          stringsAsFactors = F, 
+                          comment.char="",
+                          row.names=1)
+
 unoiseID <- read.table("otuID.tsv", header=F, sep="\t")
 
-target <- unoisetable$OTU.ID
+target <- rownames(unoisetable)
+
 unoiseIDtemp <- unoiseID[match(target, unoiseID$V1),]
-unoisetable$OTU.ID <- unoiseIDtemp$V2
-
-rownames(unoisetable) = unoisetable[,1]
-unoisetable <- unoisetable[,-1]
-dim(unoisetable)
-colnames(unoisetable) <- gsub("_*","",colnames(unoisetable))
-colnames(unoisetable) <- gsub("R1filt","",colnames(unoisetable))
-
+rownames(unoisetable) <- unoiseIDtemp$V2
+colnames(unoisetable) <- gsub("_R1_filt$","",colnames(unoisetable))
 unoiselong <- t(unoisetable)
-class(unoiselong) <- "numeric"
-str(unoiselong)
 
-
-taxa <- assignTaxonomy(unoiselong, "/scratch/db/dada2_ref_db/rdp_train_set_16.fa.gz", multithread = T)
-saveRDS(taxa, file="tax_final.rds")
+unoise_taxa <- assignTaxonomy(unoiselong, "/scratch/db/dada2_ref_db/rdp_train_set_16.fa.gz", multithread = 40)
+saveRDS(unoise_taxa, file="tax_final.rds")
 saveRDS(unoiselong, file="seqtab_final.rds")
