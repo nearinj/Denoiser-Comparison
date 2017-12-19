@@ -8,12 +8,12 @@ import os
 def main():
 
     parser = argparse.ArgumentParser(
-        description="Rename Fastq's to be used in Usearch Pipeline",
+        description="Rename Fastqs to be used in Usearch Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("-f", "--fastq", metavar="FASTQ", type=str, help="Path to FastQ file", required=True)
     parser.add_argument("-s", "--sample", metavar="Sample_Name", type=str, help="Name of sample", required=True)
     parser.add_argument("-o", "--output", metavar="Output_Directory", type=str, help="Name of Output Directory", required=True)
-    parser.add_argument("-r", "--rev", metavar="Reverse = true", type=str, help="set if doing reverse reads")
+    parser.add_argument("-r", "--rev", action="store_true", help="set if doing reverse reads")
     args = parser.parse_args()
 
     #check if output exists
@@ -36,7 +36,7 @@ def main():
             fastq_sn += 1
         i += 1
         
-    if args.rev == "y":
+    if args.rev:
         outfile=args.output + '/' + args.sample + "_R2_rename.fastq"
     else:
         outfile=args.output + '/' + args.sample + "_R1_rename.fastq"
@@ -47,12 +47,4 @@ def main():
     
 if __name__ == '__main__':
         main()
-            
-    
-    
-        
-
-    
-    
-
     
