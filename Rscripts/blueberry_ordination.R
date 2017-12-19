@@ -1,13 +1,11 @@
-#make 2d plots for blueberry
+#make 2d plots for blueberry data
+
+library("ggplot2")
+library("vegan")
 
 setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/")
-#read in proportions for the PC
-proportions <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
-#read in the number oof samples
-SampleNum <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1)
 
-#set cords for samplles
-blueberry_meta <- read.table("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/map_blueberry_merged.csv",
+blueberry_meta <- read.table("map_blueberry_merged.csv",
                              header=T,
                              comment.char="",
                              stringsAsFactors = FALSE,
@@ -15,28 +13,6 @@ blueberry_meta <- read.table("/home/jacob/projects/DenoiseCompare_Out/Blueberry/
 
 rhizosphere_samples <- unique(gsub(".*_", "", blueberry_meta[which(blueberry_meta$Description=="Rhizosphere"), "SampleID"]))
 bulk_samples <- unique(gsub(".*_", "", blueberry_meta[which(blueberry_meta$Description=="Bulk"), "SampleID"]))
-
-sample_cord <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", 
-                               sep ="\t", skip = 9, 
-                               nrow = SampleNum[[2]],
-                               header=FALSE, row.names=1)
-
-Shapes <- rep(x = 0, nrow(sample_cord))
-Colors <- rep(x = "green", nrow(sample_cord))
-
-Shapes[grep("Dada", rownames(sample_cord)) ] <- 15
-Shapes[grep("Unoise", rownames(sample_cord))] <- 16
-Shapes[grep("Deblur", rownames(sample_cord))] <- 17
-
-for (val in Rhizosphere){
-  Colors[grep(val, rownames(sample_cord))] <- "red"
-}
-
-paste(Colors)
-plot(sample_cord$V2, sample_cord$V3, 
-     xlab=paste("PC1 (",round(proportions$V1, 2)*100,"%)", sep=""),  
-     ylab=paste("PC2 (",round(proportions$V2, 2)*100,"%)", sep=""),
-     pch=c(Shapes), bg=Colors, col=Colors)
 
 # Colours taken from here: http://godsnotwheregodsnot.blogspot.ca/2012/09/color-distribution-methodology.html
 diff_col <- c("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
@@ -53,7 +29,20 @@ diff_col <- c("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", 
               "#549E79", "#FFF69F", "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
               "#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C")
 
-library("ggplot2")
+
+### Plot weighted UniFrac data
+
+#read in proportions for the PC
+proportions <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
+
+#read in the number oof samples
+SampleNum <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1)
+
+#Get coordinates for samples.
+sample_cord <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", 
+                          sep ="\t", skip = 9, 
+                          nrow = SampleNum[[2]],
+                          header=FALSE, row.names=1)
 
 unifrac_combined_blueberry <- sample_cord[,c("V2", "V3", "V4")]
 colnames(unifrac_combined_blueberry) <- c("PC1", "PC2", "PC3")
@@ -63,9 +52,7 @@ unifrac_combined_blueberry$soil <- NA
 unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample %in% rhizosphere_samples), "soil"] <- "Rhizosphere"
 unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample %in% bulk_samples), "soil"] <- "Bulk"
 
-#unifrac_combined_blueberry$sample_numeric <- as.numeric(unifrac_combined_blueberry$sample)*100
-
-p <- ggplot(data=unifrac_combined_blueberry, aes(PC1, PC2)) +
+unifrac_plot <- ggplot(data=unifrac_combined_blueberry, aes(PC1, PC2)) +
   geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
   theme_minimal() +
   xlab(paste("PC1 (",round(proportions$V1, 2)*100,"%)", sep="")) +
@@ -75,15 +62,15 @@ p <- ggplot(data=unifrac_combined_blueberry, aes(PC1, PC2)) +
   scale_fill_manual(values=diff_col)
 
 for (sample in levels(unifrac_combined_blueberry$sample)) {
-  p <- p + geom_line(data = unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample == sample),], aes(x = PC1, y = PC2))
+  unifrac_plot <- unifrac_plot + geom_line(data = unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample == sample),], aes(x = PC1, y = PC2))
 }
 
-plot(p)
+plot(unifrac_plot)
 
 
+### Plot bray-curtis distances ordination
 
-library("vegan")
-bray_curtis_dm <- read.table("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/bray_curtis/tax_sum/beta_diversity/bray_curtis_merged_blueberry_taxa_L6.txt",
+bray_curtis_dm <- read.table("bray_curtis/tax_sum/beta_diversity/bray_curtis_merged_blueberry_taxa_L6.txt",
                              sep="\t", 
                              header=T, 
                              stringsAsFactors = FALSE,
@@ -111,20 +98,3 @@ for (sample in levels(bray_curtis_NMDS_df$sample)) {
 }
 
 plot(bray_curtis_plot)
-
-
-
-combined_genus <- read.table("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/bray_curtis/tax_sum/merged_blueberry_taxa_L6.txt",
-                             sep="\t", 
-                             header=T, 
-                             stringsAsFactors = FALSE,
-                             skip=1,
-                             comment.char="",
-                             row.names=1)
-
-combined_genus_nonzero <- colSums(combined_genus > 0)
-
-boxplot(combined_genus_nonzero[grep("Deblur", names(combined_genus_nonzero))],
-        combined_genus_nonzero[grep("Unoise", names(combined_genus_nonzero))],
-        combined_genus_nonzero[grep("Dada", names(combined_genus_nonzero))],
-        names=c("Deblur", "Unoise", "Dada"))
