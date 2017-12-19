@@ -1,9 +1,14 @@
 #Used to make the Weighted Unifrac Box plots for the blueberry data
 
 library(ggplot2)
-setwd("~/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/plots/bdiv-out/")
+
+setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/plots/bdiv-out/")
 par=(mfrow=c(2,2))
+
+# Read in matrix of weighted unifrac distances at ASV level for samples across all 3 pipelines.
 DM <- read.table("weighted_unifrac_dm.txt", sep="\t", header=TRUE, row.names=1)
+
+# Read in blueberry metadata.
 bluberry_map <- read.table("../../map_blueberry_merged.csv", sep="\t", header=T, stringsAsFactors = FALSE,) 
 
 reorder_pipeline_samples <- function(dm_input, row_prefix, col_prefix) {
@@ -14,7 +19,7 @@ reorder_pipeline_samples <- function(dm_input, row_prefix, col_prefix) {
   colnames(dm_input_ordered) <- gsub("^", col_prefix, colnames(dm_input_ordered))
   
   dm_input_colnames_sample <- gsub(col_prefix, "", colnames(dm_input_ordered))
-  
+  
   if(! identical(dm_input_colnames_sample, dm_input_rownames_sample)) {
     stop("Error final row and column names don't match")
   } else {
@@ -26,9 +31,7 @@ reorder_pipeline_samples <- function(dm_input, row_prefix, col_prefix) {
 unoiseVDada <- DM[grepl("Unoise*", names(DM)) ,]
 unoiseVDada <- unoiseVDada[, grepl("Dada*", names(unoiseVDada))]
 UvDa <- data.matrix(unoiseVDada)
-
 # Already in order so don't need to re-order!
-#tmp <- reorder_pipeline_samples(dm_input=UvDa, row_prefix="Unoise_", col_prefix="Dada_")
 
 # Unoise vs Deblur
 unoiseVDeblur <- DM[grepl("Unoise*", names(DM)),]
@@ -45,25 +48,22 @@ DavDe <- data.matrix(dadaVdeblur)
 DavDe_ordered <- reorder_pipeline_samples(dm_input=DavDe, row_prefix="Dada_", col_prefix="Deblur_")
 
 # Dada vs Dada
-dadaVdada <- DM[grep("Dada", names(DM)) ,]
-dadaVdada <- dadaVdada[,grep("Dada", names(dadaVdada))]
+dadaVdada <- DM[grep("Dada", names(DM)) ,grep("Dada", names(DM))]
 DavDa <- data.matrix(dadaVdada)
 DavDa_ordered <- reorder_pipeline_samples(dm_input=DavDa, row_prefix="Dada_", col_prefix="Dada_")
 
 # Deblur vs Deblur
-deblurVdeblur <- DM[grep("Deblur", names(DM)) ,]
-deblurVdeblur <- deblurVdeblur[,grep("Deblur", names(deblurVdeblur))]
+deblurVdeblur <- DM[grep("Deblur", names(DM)) ,grep("Deblur", names(DM))]
 DevDe <- data.matrix(deblurVdeblur)
 DevDe_ordered <- reorder_pipeline_samples(dm_input=DevDe, row_prefix="Deblur_", col_prefix="Deblur_")
 
 # unoise vs unoise
-unoiseVunoise <- DM[grep("Unoise", names(DM)) ,]
-unoiseVunoise <- unoiseVunoise[,grep("Unoise", names(unoiseVunoise))]
+unoiseVunoise <- DM[grep("Unoise", names(DM)) ,grep("Unoise", names(DM))]
 UvU <- data.matrix(unoiseVunoise)
 UvU_ordered <- reorder_pipeline_samples(dm_input=UvU, row_prefix="Unoise_", col_prefix="Unoise_")
 
 
-# Sanity checks:
+# Sanity checks:
 dim(UvDa)
 dim(UvDe_ordered)
 dim(DavDe_ordered)
