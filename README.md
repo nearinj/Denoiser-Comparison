@@ -4,8 +4,8 @@
    The three pipelines are:
        DADA2
        UNOISE3
-       Deblur
-   None of the raw data is contained within this repository as it would easily exceed the maximum limit
+       Deblur. 
+   None of the raw data is contained within this repository.
 ### Blast_db
 Contains all scripts used to modify any of the Database files
 All Databases were generated using blast tools
