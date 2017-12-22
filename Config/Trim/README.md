@@ -3,7 +3,7 @@ Folders contain the pipeline config files for the Trim.sh script that can be fou
 
 
 ### About the Config Files
-All study folders contain three different configuration files named High.txt, Med.txt, and Low.txt. There names are in accordance with the strigency to be used when filtering the fastq files. Each new line in the config file is taken in as a variable in the Trim.sh script the order that it is seen (i.e line 1 = variable $1). 
+All study folders contain three different configuration files named High.txt, Med.txt, and Low.txt. There names are in accordance with the stringency to be used when filtering the fastq files. Each new line in the config file is taken in as a variable in the Trim.sh script in the order that it is seen (i.e line 1 = variable $0). 
 
 Line 1: Legacy variable that is no longer used
 
