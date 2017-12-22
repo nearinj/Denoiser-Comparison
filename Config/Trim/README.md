@@ -9,7 +9,7 @@ Line 1: Legacy variable that is no longer used
 
 Line 2: When set to 1 will delete all previous data that was generated from running the Trim.sh script with that config file.
 
-Line 3: The Directory name of where the raw fastq files are for the sample. Note (Trim.sh assumes all raw files are in ~/Mock_Communitites/MockData/ ). 
+Line 3: The directory name of where the raw fastq files are for the sample. **Note** (Trim.sh assumes all raw files are in ~/Mock_Communitites/MockData/ ). 
 
 Line 4: The max amount of jobs/threads to use when running the Trim.sh script
 
@@ -17,7 +17,7 @@ Line 5: The filter stringency that the Trim.sh script should be run at.
 
 Line 6: The forward primer sequence
 
-Line 7: The Reverse primer sequence
+Line 7: The reverse primer sequence
 
 Line 8: The length that the forward reads should be trimed to
 
