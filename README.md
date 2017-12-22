@@ -2,9 +2,9 @@
 ## About
    The aim of this project is to compare the results from three different Illumina 454 sequence denoising pipelines.
    The three pipelines are:
-       DADA2
-       UNOISE3
-       Deblur. 
+       [DADA2](https://benjjneb.github.io/dada2/)
+       [UNOISE3](https://www.drive5.com/usearch/manual/cmd_unoise3.html)
+       [Deblur](https://github.com/biocore/deblur).
    None of the raw data is contained within this repository.
 ### Blast_db
 Contains all scripts used to modify any of the Database files
