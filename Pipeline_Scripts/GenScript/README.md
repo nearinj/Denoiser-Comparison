@@ -1,0 +1,12 @@
+### Header Scripts
+All header scripts are used to run the different pipeline scripts on a sample set in parallel with each other. 
+### Dada2Pipe.sh
+Runs the DADA2 pipeline that was used to generate the DADA2 ASV. The reads are first passed into the dada2inference script which generates an error model and determines ASV, then is passed into another dada2 command that removed chimeras. The script takes two parameters the first being the config file which can be found in Config/dada2 and the other being the filter stringency (low, med, or high).
+### DeblurPipeF.sh
+Runs the Deblur pipeline that was used to generate the Deblur ASV for mock communities that only forward reads were provided (Mock8, Mock9, Mock12). The reads were first input into qiime2 and then denoised using the deblur command within qiime2. The script takes two parameters the first being the config file which can be found in Config/deblur and the other being the filter stringency (low, med, or high).
+### DeblurPipeP.sh
+Runs the Deblur pipeline that was used to generate the Deblur ASV for mock communities were both forward and reverse reads were provided. The reads were paired using run_pear.pl and then input into qiime2 where the reads were then denoised using the deblur command. The script takes two parameters the first being the config file which can be found in Config/deblur and the other being the filter stringency (low, med, or high).
+### UsearchPipe.sh
+Runs the UNOISE3 pipeline that was used to generate the UNOISE3 ASV for mock communities were both forward and reverse reads were provided. The reads are first merged into one large fastq file and then converted into fasta format. Reads were then dereplicated and run through the UNOISE3 denoiseing command. The script takes two parameters the first being the config file which can be found in Config/unoise and th other being the filter stringency (low, med, or high).
+### UsearchPipeF.sh
+Runs the UNOISE3 pipeline that was used to generate the UNOISE3 ASV for mock communities were only forward reads were provided (Mock8, Mock9, Mock12). The reads are first merged into one large fastq file and then converted into fasta format. Reads were then dereplicated and run through the UNOISE3 denoiseing command. The script takes two parameters the first being the config file which can be found in Config/unoise and th other being the filter stringency (low, med, or high).
