@@ -39,6 +39,14 @@ mergePipes <- function(Dada, Deblur, Unoise) {
   return(Dada)
 }
 
+collapseStaph <- function(tab) {
+  New_Staph <- tab[17, c("Expected", "Dada", "Deblur", "Unoise")] +HMP_HIGH[18, c("Expected", "Dada", "Deblur", "Unoise") ]
+  tab <- tab[-c(17,18), ]
+  New_Staph$Organism <- "S.aureus/epidermidis"
+  New_Staph$Otus <- "N/a"
+  tab <- merge(tab, New_Staph, all=T)
+}
+
 setwd("~/projects/DenoiseCompare/Data_Analysis/Abundance/collapsed/")
 
 HMP_DADA_HIGH <- makeFullTable("per_HMP_Dada_High_Org_col.tsv", "../expected/HMP_Expected.tsv")
@@ -49,6 +57,7 @@ HMP_UNOISE_HIGH <- makeFullTable("per_HMP_Unoise_High_Org_col.tsv", "../expected
 HMP_UNOISE_HIGH_MEAN <- getMeanHMP(HMP_UNOISE_HIGH)
 
 HMP_HIGH <- mergePipes(HMP_DADA_HIGH_MEAN, HMP_DEBLUR_HIGH_MEAN, HMP_UNOISE_HIGH_MEAN)
+HMP_HIGH <- collapseStaph(HMP_HIGH)
 
 HMP_DADA_MED <- makeFullTable("per_HMP_Dada_Med_Org_col.tsv", "../expected/HMP_Expected.tsv")
 HMP_DADA_MED_MEAN <- getMeanHMP(HMP_DADA_MED)
@@ -58,6 +67,7 @@ HMP_UNOISE_MED <- makeFullTable("per_HMP_Unoise_Med_Org_col.tsv", "../expected/H
 HMP_UNOISE_MED_MEAN <- getMeanHMP(HMP_UNOISE_MED)
 
 HMP_MED <- mergePipes(HMP_DADA_MED_MEAN, HMP_DEBLUR_MED_MEAN, HMP_UNOISE_MED_MEAN)
+HMP_MED <- collapseStaph(HMP_MED)
 
 HMP_DADA_LOW <- makeFullTable("per_HMP_Dada_Low_Org_col.tsv", "../expected/HMP_Expected.tsv")
 HMP_DADA_LOW_MEAN <- getMeanHMP(HMP_DADA_LOW)
@@ -162,7 +172,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
   
   #table 2 Zymock_Table
   ZymockTable_filt <- ZymockTable[-grep("Total", ZymockTable$Organism),]
-  ZymockTable_melt <- melt(data=ZymockTable_filt, measure.vars=c("Expected", "Dada", "Deblur", "Unoise"), 
+  ZymockTable_melt <- melt(ZymockTable_filt, measure.vars=c("Expected", "Dada", "Deblur", "Unoise"), 
                         id.vars = c("Organism"), value.name="rel_abun", variable.name="sample")
   plot2 <- ggplot(ZymockTable_melt, aes(x = sample, 
                                      y = rel_abun, 
@@ -202,10 +212,15 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
   
   plot4
   
+  New_Staph <- HMP_HIGH[17, c("Expected", "Dada", "Deblur", "Unoise")] +HMP_HIGH[18, c("Expected", "Dada", "Deblur", "Unoise") ]
+  HMP_HIGH <- HMP_HIGH[-c(17,18),]
+  New_Staph$Organism <- "S.aureus/epidermidis"
+  New_Staph$Otus <- "N/a"
+  
+  test <- merge(HMP_HIGH, New_Staph, all=T)
   
   
-  
-  grid_plot <- plot_grid(plot1, plot2, plot3, plot4, labels=c("A","B","C","D"))
+  grid_plot <- plot_grid(plot1, plot4, plot3, plot2, labels=c("A","B","C","D"))
   grid_plot
   save_plot(paste("New",filt, ".png", sep =""), grid_plot, ncol = 2, nrow = 2, base_aspect_ratio = 2)
 }

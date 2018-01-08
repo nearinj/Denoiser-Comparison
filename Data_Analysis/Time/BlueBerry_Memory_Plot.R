@@ -10,7 +10,7 @@ MasterTable <- read.table("Blueberry_time_data.tsv", sep="\t", header=T)
 deblur_memory <- MasterTable[grep("Deblur", MasterTable$Pipe),c("Filt", "TimeCMD","Memory.kb.")]
 deblur_memory$Pipe <- "Deblur"
 #Remove 40k reads as the read depth was deep enough to support this rarefaction
-deblur_memory <- deblur_times[-5,]
+deblur_memory <- deblur_memory[-5,]
 
 
 #get DADA2 memory

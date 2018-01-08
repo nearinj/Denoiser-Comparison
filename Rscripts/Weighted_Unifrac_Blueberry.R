@@ -77,16 +77,16 @@ DM["Unoise_Bact1z2z2","Deblur_Bact1z2z2"]
 UvDe_ordered["Unoise_Bact1z2z2",which(rownames(UvDe_ordered) == "Unoise_Bact1z2z2")]
 
 #box plot of intre samples distances
-boxplot(diag(DavDe_ordered),
+par(xpd= NA, bg = "transparent", oma= c(2,2,0,0))
+Unifrac_boxplot <- boxplot(diag(DavDe_ordered),
         diag(UvDa),
         diag(UvDe_ordered), 
-        DavDa_ordered[upper.tri(DavDa_ordered, diag=FALSE)],
-        DevDe_ordered[upper.tri(DevDe_ordered, diag=FALSE)],
-        UvU_ordered[upper.tri(UvU_ordered, diag=FALSE)],
-        names=c("Dada2_Deblur", "Dada2_Unoise3", "Unoise3_Deblur", "Dada_Dada", "Deblur_Deblur", "Unoise_Unoise"),
-        ylab="Bray-Curtis Distance", 
+        names=c("Dada2_Deblur", "Dada2_Unoise3", "Unoise3_Deblur"),
+        ylab="Weighted UniFrac Distance", 
         outline=FALSE)
 
+#Used to make figure 4
+Unifrac_box <- recordPlot(Unifrac_boxplot)
 
 Rhizosphere <- bluberry_map[grepl("Rhizosphere", bluberry_map$Description) ,]
 Bulk <- bluberry_map[grepl("Bulk", bluberry_map$Description),]

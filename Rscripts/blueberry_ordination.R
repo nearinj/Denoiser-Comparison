@@ -2,6 +2,8 @@
 
 library("ggplot2")
 library("vegan")
+library("cowplot")
+library("gridGraphics")
 
 setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/")
 
@@ -76,6 +78,7 @@ bray_curtis_dm <- read.table("bray_curtis/tax_sum/beta_diversity/bray_curtis_mer
                              stringsAsFactors = FALSE,
                              row.names=1)
 
+
 bray_curtis_NMDS <- metaMDS(as.dist(bray_curtis_dm))
 rownames(blueberry_meta) <- blueberry_meta$SampleID
 
@@ -83,18 +86,27 @@ bray_curtis_NMDS_df <- data.frame(NMDS1=bray_curtis_NMDS$points[,1],
                                  NMDS2=bray_curtis_NMDS$points[,2],
                                  sample=as.factor(gsub("^.+_", "", rownames(bray_curtis_NMDS$points))),
                                  Pipeline=as.factor(blueberry_meta[rownames(bray_curtis_NMDS$points), "Pipeline"]))
+bray_curtis_NMDS_df <- bray_curtis_NMDS_df[complete.cases(bray_curtis_NMDS_df),]
 
 bray_curtis_plot <- ggplot(data=bray_curtis_NMDS_df, aes(NMDS1, NMDS2)) +
   geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
   theme_minimal() +
   xlab("NMDS1") +
   ylab("NMDS2") +
-  scale_shape_manual(values = c(21, 22, 23)) +
+  scale_shape_manual(values = c(21, 22, 23))in
   guides(size=FALSE, fill=FALSE) +
   scale_fill_manual(values=diff_col)
+
+
 
 for (sample in levels(bray_curtis_NMDS_df$sample)) {
   bray_curtis_plot <- bray_curtis_plot + geom_line(data = bray_curtis_NMDS_df[which(bray_curtis_NMDS_df$sample == sample),], aes(x = NMDS1, y = NMDS2))
 }
 
 plot(bray_curtis_plot)
+
+#makes figure 4 when other script plots are loaded as well
+#par(xpd= NA, bg = "transparent", oma= c(2,2,0,0))
+#grid_plot <- plot_grid(Unifrac_box, Bray_Curtis_box, unifrac_plot, bray_curtis_plot, labels=c("A", "B", "C", "D"))
+#grid_plot
+
