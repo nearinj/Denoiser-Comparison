@@ -186,6 +186,7 @@ StackedBarplot <- function(HMPTable, ZymockTable, Mock9Table, Mock12Table, filt 
   
   #table 3 Mock9
   Mock9Table_filt <- Mock9Table[-grep("Total", Mock9Table$Organism),]
+  
   Mock9Table_melt <- melt(data=Mock9Table_filt, measure.vars=c("Expected", "Dada", "Deblur", "Unoise"), 
                           id.vars = c("Organism"), value.name="rel_abun", variable.name="sample")
   plot3 <- ggplot(Mock9Table_melt, aes(x = sample, 

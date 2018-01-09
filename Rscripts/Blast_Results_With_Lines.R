@@ -83,7 +83,9 @@ PlotSamples <- function(tab1, filt){
     geom_bar(stat = "identity", show.legend = T) + theme(axis.text.x = element_text(size = 5.5)) + ylab("ASV Counts") + 
     xlab("") + scale_fill_brewer(palette="Set1") + geom_hline(yintercept = Unique_expected[2,1], linetype="dashed")
   
-  grid_plot <- plot_grid(HMP_plot, Mock12_plot, Mock9_plot, Zymock_plot, labels=c("A", "B", "C", "D"))
-  save_plot(paste("Blast_Comp_Figs/ASV Comparison_", filt, ".png", sep=""), grid_plot, base_aspect_ratio = 2)
-
+  #grid_plot <- 
+  plot_grid(HMP_plot, Mock12_plot, Mock9_plot, Zymock_plot, labels=c("A", "B", "C", "D"))
+  
+  #save_plot(paste("Blast_Comp_Figs/ASV Comparison_", filt, ".png", sep=""), grid_plot, base_aspect_ratio = 2)
+  
 }
