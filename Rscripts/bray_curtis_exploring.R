@@ -8,6 +8,8 @@ par(xpd = NA, # switch off clipping, necessary to always see axis labels
     bg = "transparent", # switch off background to avoid obscuring adjacent plots
     oma = c(2, 2, 0, 0)) # move plot to the right and up
 
+################## Commands for exploring blueberry results ##################
+
 setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/bray_curtis/")
 
 in_tab <- read.table("tax_sum/merged_blueberry_taxa_L6.txt",
@@ -111,6 +113,79 @@ plot_grid(Bacteria_Unclassified,
           labels="AUTO",
           nrow=2,
           ncol=3)
+
+
+################## Commands for exploring BISCUIT results ##################
+
+in_tab_biscuit <- read.table("../../../../biscuit/med/COMBINED/Tax_Sum/Combined_biscuit_taxa_L6.txt",
+                     header=T,
+                     comment.char="",
+                     skip=1,
+                     sep="\t",
+                     stringsAsFactors = FALSE,
+                     row.names=1)
+
+# Split by each pipeline.
+dada_tab_biscuit <- in_tab_biscuit[, grep("Dada", colnames(in_tab_biscuit))]
+deblur_tab_biscuit <- in_tab_biscuit[, grep("Deblur", colnames(in_tab_biscuit))]
+unoise_tab_biscuit <- in_tab_biscuit[, grep("Unoise", colnames(in_tab_biscuit))]
+
+dada_tab_biscuit_means <- rowMeans(dada_tab_biscuit)
+deblur_tab_biscuit_means <- rowMeans(deblur_tab_biscuit)
+unoise_tab_biscuit_means <- rowMeans(unoise_tab_biscuit)
+
+hist(dada_tab_biscuit_means - deblur_tab_biscuit_means, xlim=c(-0.03,0.03), ylim=c(0, 100), breaks=100, main="", xlab="DADA2 - Deblur",  col="grey")
+dada_v_deblur_genera_diff_biscuit <- recordPlot()
+
+hist(dada_tab_biscuit_means - unoise_tab_biscuit_means, xlim=c(-0.03,0.03), ylim=c(0, 100), breaks=50, main="", xlab="DADA2 - UNOISE3", col="grey")
+dada_v_unoise_genera_diff_biscuit <- recordPlot()
+
+hist(deblur_tab_biscuit_means - unoise_tab_biscuit_means, xlim=c(-0.03,0.03), ylim=c(0, 100), breaks=100, main="", xlab="Deblur - UNOISE3",  col="grey")
+deblur_v_unoise_genera_diff_biscuit <- recordPlot()
+
+plot_grid(dada_v_deblur_genera_diff_biscuit,
+          dada_v_unoise_genera_diff_biscuit,
+          deblur_v_unoise_genera_diff_biscuit,
+          labels="AUTO")
+
+dada_deblur_diff_biscuit <- dada_tab_biscuit_means - deblur_tab_biscuit_means
+unoise_deblur_diff_biscuit <- unoise_tab_biscuit_means - deblur_tab_biscuit_means
+unoise_dada_diff_biscuit <- unoise_tab_biscuit_means - dada_tab_biscuit_means
+
+which(abs(unoise_deblur_diff_biscuit) > 0.005)
+which(abs(dada_deblur_diff_biscuit) > 0.005)
+
+### The 2 overlapping both are:
+#Bacteria;Firmicutes;Clostridia;Clostridiales;Lachnospiraceae;Unclassified 
+#72 
+#Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Escherichia/Shigella 
+#146 
+
+boxplot(as.numeric(dada_tab_biscuit[72,]), 
+        as.numeric(deblur_tab_biscuit[72,]),
+        as.numeric(unoise_tab_biscuit[72,]),
+        names = c("Dada", "Deblur", "Unoise"),
+        ylab = "Bacteria;Firmicutes;Clostridia;Clostridiales;Lachnospiraceae;Unclassified",
+        ylim=c(0,0.23))
+
+Lachnospiraceae_boxplot <- recordPlot()
+
+boxplot(as.numeric(dada_tab_biscuit[146,]), 
+        as.numeric(deblur_tab_biscuit[146,]),
+        as.numeric(unoise_tab_biscuit[146,]),
+        names = c("Dada", "Deblur", "Unoise"),
+        ylab = "Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Escherichia/Shigella",
+        ylim=c(0,0.6))
+
+Ecoli_boxplot <- recordPlot()
+
+plot_grid(Lachnospiraceae_boxplot,
+          Ecoli_boxplot,
+          labels="AUTO",
+          nrow=1,
+          ncol=2)
+
+################## The below commented out commands were used for exploring the data, but not for making supplementary figures ################## 
 
 # One sample's rel. abundance in terms of classified and unclassified genera
 #all_unclassified <- grep("Unclassified", rownames(in_tab))
