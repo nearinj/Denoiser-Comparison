@@ -84,6 +84,13 @@ boxplot(as.numeric(dada_tab[439,]),
         ylab = "Bacteria;Unclassified;Unclassified;Unclassified;Unclassified;Unclassified",
         ylim=c(0,0.23))
 
+
+
+t.test(dada_tab[439,], unoise_tab[439,])
+
+t.test(deblur_tab[439,], unoise_tab[439,])
+t.test(deblur_tab[439,], dada_tab[439,])
+
 Bacteria_Unclassified <- recordPlot()
 
 boxplot(as.numeric(dada_tab[451,]), 

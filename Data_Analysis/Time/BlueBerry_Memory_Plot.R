@@ -50,7 +50,9 @@ recombined_Memory$Filt <- paste(recombined_Memory$Pipe, c("325k", "648k", "1287k
 group.colors <- c(Deblur = "#333BFF", DADA2 = "#CC6600", UNOISE3 = "#9633FF")
 recombined_Memory$Filt <- factor(recombined_Memory$Filt, levels = orders)
 
+recombined_Memory$Memory.kb. <- recombined_Memory$Memory.kb./1024
+
 #make the plot
 Memoryplot <- ggplot(recombined_Memory, aes(x= Filt, y=Memory.kb., fill=Pipeline)) + geom_bar(stat = "identity") + scale_fill_manual(values=group.colors) +
-  xlab("") + theme(axis.text = element_text(size=10)) + ylab("Memory used in Kb") + scale_y_continuous(breaks=c(1000000,2000000,3000000,4000000,5000000))
+  xlab("") + theme(axis.text = element_text(size=10)) + ylab("Memory used in Mb")
 Memoryplot
