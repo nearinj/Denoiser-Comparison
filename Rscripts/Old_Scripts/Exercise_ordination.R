@@ -5,9 +5,9 @@ library("vegan")
 library("cowplot")
 library("gridGraphics")
 
-setwd("/home/jacob/projects/DenoiseCompare_Out/Exercise_med/med/COMBINED/")
+setwd("/home/jacob/projects/DenoiseCompare_Out/Exercise_med/med/COMBINED/biom/fixed_combined/pplacer_distances/")
 
-meta <- read.table("map.txt",
+#meta <- read.table("map.txt",
                              header=T,
                              comment.char="",
                              stringsAsFactors = FALSE,
@@ -33,13 +33,13 @@ diff_col <- c("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", 
 ### Plot weighted UniFrac data
 
 #read in proportions for the PC
-proportions <- read.table("plots/bdiv/weighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
+proportions <- read.table("weighted_PC_cords.txt", sep = "\t", nrow=1, skip=4)
 
 #read in the number oof samples
-SampleNum <- read.table("plots/bdiv/weighted_unifrac_pc.txt", sep = "\t", nrow=1)
+SampleNum <- read.table("weighted_PC_cords.txt", sep = "\t", nrow=1)
 
 #Get coordinates for samples.
-sample_cord <- read.table("plots/bdiv/weighted_unifrac_pc.txt", 
+sample_cord <- read.table("weighted_PC_cords.txt", 
                           sep ="\t", skip = 9, 
                           nrow = SampleNum[[2]],
                           header=FALSE, row.names=1)
@@ -57,7 +57,7 @@ unifrac_plot <- ggplot(data=unifrac_combined_Exercise, aes(PC1, PC2)) +
   theme_minimal() +
   xlab(paste("PC1 (",round(proportions$V1, 2)*100,"%)", sep="")) +
   ylab(paste("PC2 (",round(proportions$V2, 2)*100,"%)", sep="")) +
-  scale_shape_manual(values = c(21, 22, 23)) +
+  scale_shape_manual(values = c(21, 22, 23, 24 ,25)) +
   guides(size=FALSE, fill=FALSE) +
   scale_fill_manual(values=diff_col)
 
@@ -108,3 +108,39 @@ plot(bray_curtis_plot)
 #grid_plot <- plot_grid(Unifrac_box, Bray_Curtis_box, unifrac_plot, bray_curtis_plot, labels=c("A", "B", "C", "D"), rel_heights = c(1,2))
 #grid_plot
 
+#unweighted unifrac
+
+#read in proportions for the PC
+unweighted_prop <- read.table("plots/bdiv/weighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
+
+#read in the number oof samples
+unweighted_SampleNum <- read.table("plots/bdiv-new/unweighted_unifrac_pc.txt", sep = "\t", nrow=1)
+
+#Get coordinates for samples.
+unweighted_sample_cord <- read.table("plots/bdiv-new/unweighted_unifrac_pc.txt", 
+                          sep ="\t", skip = 9, 
+                          nrow = SampleNum[[2]],
+                          header=FALSE, row.names=1)
+
+unweighted_combined_Exercise <- unweighted_sample_cord[,c("V2", "V3", "V4")]
+colnames(unweighted_combined_Exercise) <- c("PC1", "PC2", "PC3")
+unweighted_combined_Exercise$sample <- as.factor(gsub("^.+_", "", rownames(unweighted_combined_Exercise)))
+unweighted_combined_Exercise$Pipeline <- factor(gsub("_.+$", "", rownames(unweighted_combined_Exercise)))
+unweighted_combined_Exercise$soil <- NA
+unweighted_combined_Exercise$Pipeline <- gsub("Dada", "DADA2", unweighted_combined_Exercise$Pipeline)
+unweighted_combined_Exercise$Pipeline <- gsub("Unoise", "UNOISE3", unweighted_combined_Exercise$Pipeline)
+
+unweighted_plot <- ggplot(data=unweighted_combined_Exercise, aes(PC1, PC2)) +
+  geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
+  theme_minimal() +
+  xlab(paste("PC1 (",round(unweighted_prop$V1, 2)*100,"%)", sep="")) +
+  ylab(paste("PC2 (",round(unweighted_prop$V2, 2)*100,"%)", sep="")) +
+  scale_shape_manual(values = c(21, 22, 23)) +
+  guides(size=FALSE, fill=FALSE) +
+  scale_fill_manual(values=diff_col)
+
+for (sample in levels(unweighted_combined_Exercise$sample)) {
+  unweighted_plot <- unweighted_plot + geom_line(data = unweighted_combined_Exercise[which(unweighted_combined_Exercise$sample == sample),], aes(x = PC1, y = PC2))
+}
+
+plot(unweighted_plot)

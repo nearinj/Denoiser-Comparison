@@ -26,6 +26,7 @@ def main():
     NonmatchSeq = {}
     prevLine = ""
     prev2Line = ""
+    test_miss= 0
     
     Fasta_Seqs=read_fasta(args.fasta)
     with open(args.output, "a") as out:
@@ -35,28 +36,33 @@ def main():
             for line in blast:
                 if lc == 3 and "Fields:" not in line:
                     lc = 0
-                    print("Current line is:" + line)
-                    print("Last line was:" +prev2Line)
+                    if "0 hits" in line:
+                        missed_seq_name=prev2Line.split(" ")[2].rstrip()
+                        NonmatchSeq[missed_seq_name] = Fasta_Seqs[missed_seq_name]
+                    
                    # values = prev2Line.split(" ")
                    # name = values[int(len(values)-1)]
                    # NonmatchSeq[name] = Fasta_Seqs[name]
                 elif lc <= 4:
                     lc += 1
                 else:
-                    lc = 0
+                    hits_found=prevLine.split(" ")[1]
+                    lc = -int(hits_found)+1
+                    
                     #read in all the values from the line
                     name,match,identity,align,mismatch,gap,qstart,qend,sstart,send,ev,bit = line.split("\t")
                     #check if identity is 100% and if so check if the alignment length = the length of the fasta sequence
-                    if identity == "100.000":
+                    if float(identity) == 100.00:
                         if int(len(Fasta_Seqs[name])) == int(align):
                             Pnummatch += 1
                         else:
-                            score=float(align)/float(len(Fasta_Seqs[name]))
+                            score=float(float(qend)-float(qstart)+1)/float(len(Fasta_Seqs[name]))
                             if score >= 0.97:
                                 
                                 APnummatch += 1
                             else:
                                 NonmatchSeq[name] = Fasta_Seqs[name]
+                                test_miss += 1
                     elif float(identity) >= 97.0:
                         
                         if int(len(Fasta_Seqs[name])) == int(align):
@@ -64,16 +70,18 @@ def main():
                             APnummatch += 1
                         else:
                             
-                            Addmismatch = int(len(Fasta_Seqs[name]))-int(align)
-                            newmismatch = Addmismatch + int(mismatch)
-                            score = 1.0-(float(newmismatch))/float(len(Fasta_Seqs[name]))
+                            not_aligned = float(len(Fasta_Seqs[name])) - (float(qend)-float(qstart)+1.0)
+                            score = 1.0-(float(mismatch)+float(not_aligned)+float(gap))/float(len(Fasta_Seqs[name]))
                             if float(score) >= 0.97:
                                 
                                 APnummatch += 1
                             else:
                                 NonmatchSeq[name] = Fasta_Seqs[name]
+                                test_miss +=1
                     else:
                         NonmatchSeq[name] = Fasta_Seqs[name]
+                        test_miss +=1
+                    print(name)
                 prev2Line=prevLine
                 prevLine=line
                                 
@@ -83,7 +91,8 @@ def main():
         for name in NonmatchSeq:
             nonmatch.write(">"+name+"\n "+NonmatchSeq[name]+"\n")
                 
-
+    print(len(NonmatchSeq))
+    print(test_miss)
 
     #function written by Gavin Douglas
 def read_fasta(filename):

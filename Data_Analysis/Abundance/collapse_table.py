@@ -138,7 +138,6 @@ def main():
             while i < samplenum:
                 sampletotals.append(infos[i+2].rstrip("\n"))
                 i += 1
-            print(sampletotals)
         with open(args.output, "r") as in_file:
             with open("per_"+args.output, "w") as out_file:
                 lc = 0
@@ -147,17 +146,13 @@ def main():
                         out_file.write(line.rstrip("\n")+"\n")
                         lc += 1
                     else:
-                        print(line)
                         info=line.split("\t")
                         #get the percent val for the samples
                         sampleval = []
                         j = 1
-                        print(samplenum)
                         while j <= samplenum:
-                            print("info[j+1]: "+info[j+1])
                             sampleval.append(info[j+1])
                             j += 1
-                        print(sampleval)
                         percentval = []
                         k = 0
                         while k < int(len(sampleval)):

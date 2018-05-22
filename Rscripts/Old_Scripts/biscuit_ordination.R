@@ -109,3 +109,38 @@ plot(bray_curtis_plot)
 #grid_plot <- plot_grid(Unifrac_box, Bray_Curtis_box, unifrac_plot, bray_curtis_plot, labels=c("A", "B", "C", "D"), rel_heights = c(1,2))
 #grid_plot
 
+
+
+
+#lets do unweighted now
+
+unweight_porp <- read.table("plots/bdiv/unweighted_unifrac_pc.txt", sep="\t", skip=4, nrow=1)
+unweight_samples <- read.table("plots/bdiv/unweighted_unifrac_pc.txt", sep="\t", nrow=1)
+unweight_coords <- read.table("plots/bdiv/unweighted_unifrac_pc.txt", 
+                              sep ="\t", skip = 9, 
+                              nrow = SampleNum[[2]],
+                              header=FALSE, row.names=1)
+
+unweighted_combined_biscuit <- unweight_coords[,c("V2", "V3", "V4")]
+colnames(unweighted_combined_biscuit) <- c("PC1", "PC2", "PC3")
+unweighted_combined_biscuit$sample <- as.factor(gsub("^.+_", "", rownames(unweighted_combined_biscuit)))
+unweighted_combined_biscuit$Pipeline <- factor(gsub("_.+$", "", rownames(unweighted_combined_biscuit)))
+unweighted_combined_biscuit$soil <- NA
+unweighted_combined_biscuit$Pipeline <- gsub("Dada", "DADA2", unweighted_combined_biscuit$Pipeline)
+unweighted_combined_biscuit$Pipeline <- gsub("Unoise", "UNOISE3", unweighted_combined_biscuit$Pipeline)
+
+unweighted_plot <- ggplot(data=unweighted_combined_biscuit, aes(PC1, PC2)) +
+  geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
+  theme_minimal() +
+  xlab(paste("PC1 (",round(unweight_porp$V1, 2)*100,"%)", sep="")) +
+  ylab(paste("PC2 (",round(unweight_porp$V2, 2)*100,"%)", sep="")) +
+  scale_shape_manual(values = c(21, 22, 23)) +
+  guides(size=FALSE, fill=FALSE) +
+  scale_fill_manual(values=diff_col)
+
+for (sample in levels(unweighted_combined_biscuit$sample)) {
+  unweighted_plot <- unweighted_plot + geom_line(data = unweighted_combined_biscuit[which(unweighted_combined_biscuit$sample == sample),], aes(x = PC1, y = PC2))
+}
+
+plot(unweighted_plot)
+

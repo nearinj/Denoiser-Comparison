@@ -27,7 +27,7 @@ if [ "${vars[6]}" != "" ]; then
     mkdir Dadaout
     cd Dadaout
     echo "*************************************************** getting Error Rates ********************************"
-    (time dada2_inference.R -f ../ --seed 1995 -t ${vars[3]} --verbose) 2>timeI.txt
+    (/usr/bin/time -v dada2_inference.R -f ../ --seed 1995 -t ${vars[3]} --verbose) 2>timeI.txt
     
 else
 
@@ -52,7 +52,7 @@ fi
 
 echo "****************************************** Chimera Checking Assigning Taxonomy *******************************"
 
-(time dada2_chimera_taxa.R -i seqtab.rds -r ~/etc/databases/rdp_train_set_16.fa --skip_species -t ${vars[3]} ) 2> timeCT.txt
+(/usr/bin/time -v dada2_chimera_taxa.R -i seqtab.rds -r ~/etc/databases/rdp_train_set_16.fa --skip_species -t ${vars[3]} ) 2> timeCT.txt
 
 
 

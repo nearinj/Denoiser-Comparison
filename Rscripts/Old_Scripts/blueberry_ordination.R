@@ -5,16 +5,8 @@ library("vegan")
 library("cowplot")
 library("gridGraphics")
 
-setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/")
+setwd("/home/jacob/projects/DenoiseCompare_Out/Blueberry/med/COMBINED/biom/final_combined/distances/")
 
-blueberry_meta <- read.table("map_blueberry_merged.csv",
-                             header=T,
-                             comment.char="",
-                             stringsAsFactors = FALSE,
-                             sep="\t")
-
-rhizosphere_samples <- unique(gsub(".*_", "", blueberry_meta[which(blueberry_meta$Description=="Rhizosphere"), "SampleID"]))
-bulk_samples <- unique(gsub(".*_", "", blueberry_meta[which(blueberry_meta$Description=="Bulk"), "SampleID"]))
 
 # Colours taken from here: http://godsnotwheregodsnot.blogspot.ca/2012/09/color-distribution-methodology.html
 diff_col <- c("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
@@ -35,13 +27,13 @@ diff_col <- c("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", 
 ### Plot weighted UniFrac data
 
 #read in proportions for the PC
-proportions <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
+proportions <- read.table("weighted_pc.txt", sep = "\t", nrow=1, skip=4)
 
 #read in the number oof samples
-SampleNum <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", sep = "\t", nrow=1)
+SampleNum <- read.table("weighted_pc.txt", sep = "\t", nrow=1)
 
 #Get coordinates for samples.
-sample_cord <- read.table("plots/bdiv-out/weighted_unifrac_pc.txt", 
+sample_cord <- read.table("weighted_pc.txt", 
                           sep ="\t", skip = 9, 
                           nrow = SampleNum[[2]],
                           header=FALSE, row.names=1)
@@ -54,12 +46,17 @@ unifrac_combined_blueberry$soil <- NA
 unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample %in% rhizosphere_samples), "soil"] <- "Rhizosphere"
 unifrac_combined_blueberry[which(unifrac_combined_blueberry$sample %in% bulk_samples), "soil"] <- "Bulk"
 
-unifrac_plot <- ggplot(data=unifrac_combined_blueberry, aes(PC1, PC2)) +
+
+#remove noPos samples
+unifrac_combined_blueberry_temp <- unifrac_combined_blueberry[-which(unifrac_combined_blueberry$Pipeline %in% "Deblur-noPos"),]
+
+
+unifrac_plot <- ggplot(data=unifrac_combined_blueberry_temp, aes(PC1, PC2)) +
   geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
   theme_minimal() +
   xlab(paste("PC1 (",round(proportions$V1, 2)*100,"%)", sep="")) +
   ylab(paste("PC2 (",round(proportions$V2, 2)*100,"%)", sep="")) +
-  scale_shape_manual(values = c(21, 22, 23)) +
+  scale_shape_manual(values = c(21, 22, 23, 24)) +
   guides(size=FALSE, fill=FALSE) +
   scale_fill_manual(values=diff_col)
 
@@ -110,3 +107,39 @@ plot(bray_curtis_plot)
 #grid_plot <- plot_grid(Unifrac_box, Bray_Curtis_box, unifrac_plot, bray_curtis_plot, labels=c("A", "B", "C", "D"))
 #grid_plot
 
+#plot unweighted
+
+#read in proportions for the PC
+unweighted_prop <- read.table("plots/bdiv-new/unweighted_unifrac_pc.txt", sep = "\t", nrow=1, skip=4)
+
+#read in the number oof samples
+unweighted_SampleNum <- read.table("plots/bdiv-new/unweighted_unifrac_pc.txt", sep = "\t", nrow=1)
+
+#Get coordinates for samples.
+unweighted_sample_cord <- read.table("plots/bdiv-new/unweighted_unifrac_pc.txt", 
+                          sep ="\t", skip = 9, 
+                          nrow = SampleNum[[2]],
+                          header=FALSE, row.names=1)
+
+unweighted_combined_blueberry <- unweighted_sample_cord[,c("V2", "V3", "V4")]
+colnames(unweighted_combined_blueberry) <- c("PC1", "PC2", "PC3")
+unweighted_combined_blueberry$sample <- as.factor(gsub("^.+_", "", rownames(unweighted_combined_blueberry)))
+unweighted_combined_blueberry$Pipeline <- factor(gsub("_.+$", "", rownames(unweighted_combined_blueberry)))
+unweighted_combined_blueberry$soil <- NA
+unweighted_combined_blueberry[which(unweighted_combined_blueberry$sample %in% rhizosphere_samples), "soil"] <- "Rhizosphere"
+unweighted_combined_blueberry[which(unweighted_combined_blueberry$sample %in% bulk_samples), "soil"] <- "Bulk"
+
+unweighted_plot <- ggplot(data=unweighted_combined_blueberry, aes(PC1, PC2)) +
+  geom_point(aes(fill=sample, size=1.5, shape=Pipeline)) +
+  theme_minimal() +
+  xlab(paste("PC1 (",round(unweighted_prop$V1, 2)*100,"%)", sep="")) +
+  ylab(paste("PC2 (",round(unweighted_prop$V2, 2)*100,"%)", sep="")) +
+  scale_shape_manual(values = c(21, 22, 23)) +
+  guides(size=FALSE, fill=FALSE) +
+  scale_fill_manual(values=diff_col)
+
+for (sample in levels(unweighted_combined_blueberry$sample)) {
+  unweighted_plot <- unweighted_plot + geom_line(data = unweighted_combined_blueberry[which(unweighted_combined_blueberry$sample == sample),], aes(x = PC1, y = PC2))
+}
+
+plot(unweighted_plot)

@@ -62,10 +62,10 @@ echo "********************************** Convert to FASTA **********************
 run_fastq_to_fasta.pl -p ${vars[3]} -o fasta_files all.merged.fq
 
 echo "************************************* Finding Unique Reads and Abundances ***********************"
-(time usearch10 -fastx_uniques fasta_files/*fasta -sizeout -relabel Uniq -fastaout uniques.fa) 2>Unitime.txt
+(/usr/bin/time -v usearch10 -fastx_uniques fasta_files/*fasta -sizeout -relabel Uniq -fastaout uniques.fa) 2>Unitime.txt
 
 echo "******************************** DeNoise Sequences ****************************************************************"
-(time usearch10 -unoise3 uniques.fa -zotus zotus.fa) 2>Dtime.txt
+(/usr/bin/time -v usearch10 -unoise3 uniques.fa -zotus zotus.fa) 2>Dtime.txt
 
 cp zotus.fa zotusfix.fa
 

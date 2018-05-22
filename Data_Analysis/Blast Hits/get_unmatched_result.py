@@ -23,7 +23,10 @@ def main():
     sample=heads[0]
     pipe=heads[1]
     filt=heads[2]
-
+    prevLine =""
+    prev2Line=""
+    Miss=0
+    test_count=0
     
     with open(args.output, "a") as out:
         
@@ -33,33 +36,47 @@ def main():
             for line in blast:
                 if lc == 3 and "Fields:" not in line:
                     lc = 0
+                    if "0 hits" in line:
+                        Miss += 1
+                        print("0 hits found")
+                        test_count += 1
                 elif lc <= 4:
                     lc += 1
                 else:
-                    lc = 0
+                    test_count += 1
+                    hits_found=prevLine.split(" ")[1]
+                    lc = -int(hits_found)+1
+                    
                     name,match,identity,align,mismatch,gap,qstart,qend,sstart,send,ev,bit = line.split("\t")
-                    if identity == "100.000":
+                    if float(identity) == 100.00:
                         
                         #have to account for the carriage return
                         if (int(len(Fasta_Seqs[name]))-1) == int(align):
                             Pnummatch += 1
                         else:
-                            score=float(align)/(float(len(Fasta_Seqs[name]))-1)
+                            score=float(float(qend)-float(qstart)+1)/(float(len(Fasta_Seqs[name])))
                             if score >= 0.97:
                                 APnummatch += 1
+                            else:
+                                Miss += 1
                     elif float(identity) >= 97.0:
                         
                 
                         if (int(len(Fasta_Seqs[name]))-1) == int(align):
                             APnummatch += 1
                         else:
-                            Addmismatch = (int(len(Fasta_Seqs[name]))-1)-int(align)
-                            newmismatch = Addmismatch + int(mismatch)
-                            score = 1.0-(float(newmismatch))/(float(len(Fasta_Seqs[name]))-1)
+                            not_aligned = float(len(Fasta_Seqs[name])) - (float(qend)-float(qstart)+1.0)
+                            score = 1.0-(float(mismatch)+float(not_aligned)+float(gap))/float(len(Fasta_Seqs[name]))
                             if float(score) >= 0.97:
                                 APnummatch += 1
-        out.write("\n"+sample+"\t"+pipe+"\t"+filt+"\t"+str(Pnummatch)+"\t"+str(APnummatch))                
-                    
+                            else:
+                                Miss += 1
+                    elif float(identity) < 97.0:
+                        Miss += 1
+                prev2Line=prevLine
+                prevLine=line
+        out.write("\n"+sample+"\t"+pipe+"\t"+filt+"\t"+str(Pnummatch)+"\t"+str(APnummatch)+"\t"+str(Miss))              
+        print(test_count)            
 
 
     

@@ -11,6 +11,8 @@ deblurtable <- read.table("table.tsv",
                           comment.char="",
                           row.names=1)
 
+#generated from rename_seqs.py
+
 deblurID <- read.table("seqID.tsv", header=FALSE, sep="\t")
 
 target <- rownames(deblurtable)

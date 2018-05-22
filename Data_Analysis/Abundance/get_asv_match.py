@@ -5,6 +5,7 @@
 
 import argparse
 import re
+import sys
 
 def main():
 
@@ -24,7 +25,7 @@ def main():
     filt = fields[1]+fields[2].split(".")[0]
     Fasta_Seqs=read_fasta(args.fasta)
     AsvtoMatch={}
-
+    prevLine=""
 
     #have to get every 6th line and make sure its over 97% match
 
@@ -34,18 +35,24 @@ def main():
         for line in blast:
             if lc == 3 and "Fields:" not in line:
                 lc = 0
+                if "0 hits" not in line:
+                    print("Failure")
+                    sys.exit(0)
             elif lc <= 4:
                 lc += 1
             else:
-                lc = 0
+                if "hits found" not in prevLine:
+                    print("wrong line")
+                    sys.exit(0)
+                hits_found=prevLine.split(" ")[1]
+                lc = -int(hits_found)+1
                 #read in all the values from the line
                 name,match,identity,align,mismatch,gap,qstart,qend,sstart,send,ev,bit = line.split("\t")
-                print(name)
-                if identity == "100.000":
+                if float(identity) == 100.00:
                     if int(len(Fasta_Seqs[name])) == int(align):
                         AsvtoMatch[name]=match
                     else:
-                        score=float(align)/float(len(Fasta_Seqs[name]))
+                        score=float(float(qend)-float(qstart)+1)/float(len(Fasta_Seqs[name]))
                         if score >= 0.97:
                             AsvtoMatch[name]=match
                 elif float(identity) >= 97.0:
@@ -53,11 +60,11 @@ def main():
                     if int(len(Fasta_Seqs[name])) == int(align):
                         AsvtoMatch[name]=match
                     else:
-                        Addmismatch = int(len(Fasta_Seqs[name]))-int(align)
-                        newmismatch = Addmismatch + int(mismatch)
-                        score = 1.0-(float(newmismatch))/float(len(Fasta_Seqs[name]))
+                        not_aligned = float(len(Fasta_Seqs[name])) - (float(qend)-float(qstart)+1.0)
+                        score = 1.0-(float(mismatch)+float(not_aligned)+float(gap))/float(len(Fasta_Seqs[name]))
                         if float(score) >= 0.97:
                             AsvtoMatch[name]=match
+            prevLine=line
     with open(Study+"_"+pipe+"_"+filt+".matchs", "w") as out:
         for name in AsvtoMatch:
             out.write(name+"\t"+AsvtoMatch[name]+"\n")

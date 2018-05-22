@@ -36,7 +36,7 @@ if [[ ${vars[6]} != "" ]]; then
     cd ../../
 
 
-    else
+else
 
 	echo "******************************* Pairing reads together **************************************************"
 	run_pear.pl -o stitched_reads filtered_fastqs/*fastq -p ${vars[4]}
@@ -65,7 +65,7 @@ cd deblurP
 
 echo "******************** Running Deblur on forward reads ********************************************"
 
-(time qiime deblur denoise-16S --p-jobs-to-start ${vars[4]} --i-demultiplexed-seqs filtered.qza --p-trim-length 350 --o-representative-sequences rep-seqs-deblur.qza --o-table table-deblur.qza --o-stats deblur-stats.qza) 2> DTime.txt
+(/usr/bin/time -v qiime deblur denoise-16S --p-jobs-to-start ${vars[4]} --i-demultiplexed-seqs filtered.qza --p-trim-length 350 --o-representative-sequences rep-seqs-deblur.qza --o-table table-deblur.qza --o-stats deblur-stats.qza) 2> DTime.txt
 
 
 echo "************************** Genereating FeatureData summaries and Feature Tables *******************************************"
@@ -78,7 +78,7 @@ qiime feature-table tabulate-seqs \
 
 mkdir final
 
-qiime toosl export table-deblur.qza --output-dir final
+qiime tools export table-deblur.qza --output-dir final
 biom convert -i final/feature-table.biom --to-tsv -o table.tsv
 
 echo "*************************** Done running forward read deblur pipeline ***************************************************"
