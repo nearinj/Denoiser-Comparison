@@ -10,3 +10,5 @@ Takes in a blast file as well as the fasta file that was used to generate it and
 Runs add_organism.sh on each pipeline data set at each filter stringency.
 ### run_collapse_table.sh
 Runs run_collapse_table.sh on each pipeline data set at each filter stringency.
+
+### All incl_db scripts are the same scripts as above but blasts the results against the SILVA/UNITE database. This script was used to create the Fungi ASV abundances due to the incomplete nature of the Fungi (mock-9) expected dataset. 
